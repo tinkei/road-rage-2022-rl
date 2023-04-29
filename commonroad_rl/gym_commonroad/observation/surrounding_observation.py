@@ -465,7 +465,7 @@ class SurroundingObservation(Observation):
         dyn_obstacles, static_obstacles = self._scenario.dynamic_obstacles, self._scenario.static_obstacles
 
         for o in dyn_obstacles:
-            if o.initial_state.time_step <= self._current_time_step <= o.prediction.trajectory.final_state.time_step:
+            if o.prediction is not None and hasattr(o.prediction, 'trajectory') and o.initial_state.time_step <= self._current_time_step <= o.prediction.trajectory.final_state.time_step:
                 obstacle_state = o.state_at_time(self._current_time_step)
                 obstacle_point = pycrcc.Point(obstacle_state.position[0], obstacle_state.position[1])
                 if surrounding_area.collide(obstacle_point):
@@ -569,7 +569,7 @@ class SurroundingObservation(Observation):
         # iterate over all dynamic obstacles
         for o in dyn_obstacles:
             # TODO: initial lanelet_assignment missed?
-            if o.prediction is not None:
+            if o.prediction is not None and hasattr(o.prediction, 'trajectory'):
                 # center_lanelet_ids = list(o.prediction.center_lanelet_assignment.values())
                 if o.initial_state.time_step <= self._current_time_step <= o.prediction.trajectory.final_state.time_step:
                     obstacle_state = o.state_at_time(self._current_time_step)
@@ -751,13 +751,19 @@ Im        Sets the turning-lights in observation_dict for all observed obstacles
             p_rel_lead: relative position to leading obstacle
             o_lead: state of leading obstacle
         """
+        # if not hasattr(obs_state, 'velocity'):
+        #     print(f'Obstacle state has no velocity attribute!!!!!')
+        #     print(str(obs_state))
 
         if distance_sign == 1 and distance_abs < p_rel_follow:
             # following vehicle, distance is smaller
             ego_state_orientation = ego_state.orientation if hasattr(ego_state, "orientation") else np.arctan2(
                 ego_state.velocity_y, ego_state.velocity)
             delta_orientation = obs_state.orientation - ego_state_orientation
-            v_rel_follow = ego_state.velocity - obs_state.velocity * np.cos(delta_orientation)
+            if hasattr(obs_state, 'velocity'):
+                v_rel_follow = ego_state.velocity - obs_state.velocity * np.cos(delta_orientation)
+            else:
+                v_rel_follow = ego_state.velocity
             p_rel_follow = distance_abs
             o_follow = obs_state
             obstacle_follow = obstacle
@@ -766,7 +772,10 @@ Im        Sets the turning-lights in observation_dict for all observed obstacles
             ego_state_orientation = ego_state.orientation if hasattr(ego_state, "orientation") else np.arctan2(
                 ego_state.velocity_y, ego_state.velocity)
             delta_orientation = obs_state.orientation - ego_state_orientation
-            v_rel_lead = obs_state.velocity * np.cos(delta_orientation) - ego_state.velocity
+            if hasattr(obs_state, 'velocity'):
+                v_rel_lead = obs_state.velocity * np.cos(delta_orientation) - ego_state.velocity
+            else:
+                v_rel_lead = - ego_state.velocity
             p_rel_lead = distance_abs
             o_lead = obs_state
             obstacle_lead = obstacle

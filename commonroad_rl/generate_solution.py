@@ -121,6 +121,7 @@ def create_solution(commonroad_env: CommonroadEnv, output_directory: str, cost_f
         csw = CommonRoadSolutionWriter(solution=solution)
         csw.write_to_file(output_path=output_directory, overwrite=True)
         LOGGER.info(f"Solution feasible, {commonroad_env.benchmark_id} printed to {output_directory}")
+        print(f"Solution feasible, {commonroad_env.benchmark_id} printed to {output_directory}")
     else:
         LOGGER.info(f"Unable to create solution, invalid trajectory!")
     return solution_valid
@@ -177,7 +178,10 @@ def solve_scenarios(test_path: str, model_path: str, algo: str, solution_path: s
         if env.observation_dict["is_goal_reached"][0] and not env.observation_dict["is_collision"][0]:
             LOGGER.info("Goal reached")
             os.makedirs(solution_path, exist_ok=True)
-            solution_valid = create_solution(env, solution_path, cost_function, computation_time=elapsed_time)
+            try:
+                solution_valid = create_solution(env, solution_path, cost_function, computation_time=elapsed_time)
+            except:
+                solution_valid = False
         else:
             goal = env.planning_problem.goal
             state = env.ego_action.vehicle.state

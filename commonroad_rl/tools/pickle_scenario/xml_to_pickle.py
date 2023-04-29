@@ -49,6 +49,7 @@ def process_single_file(rank: int, fns: List[str], duplicate: bool, output_dir: 
 
     for i, fn in enumerate(fns):
         print(f"{i + 1}/{len(fns)}", end="\r")
+        # try:
         scenario, planning_problem_set = CommonRoadFileReader(fn).open(lanelet_assignment=True)
         problem_dict = {"obstacle": scenario.obstacles, "planning_problem_set": planning_problem_set}
         map_name_id = parse_map_name(scenario.scenario_id)
@@ -58,6 +59,11 @@ def process_single_file(rank: int, fns: List[str], duplicate: bool, output_dir: 
             if is_initial_collision(planning_problem_set, env_reset):
                 continue
             meta_scenario_reset_dict[map_name_id] = env_reset
+        # except Exception as e:
+        #     print(f'Exception encountered.')
+        #     print(e)
+        #     print(repr(e))
+        #     continue
 
         if duplicate:
             with open(os.path.join(output_dir, "problem_train", f"{scenario.scenario_id}.pickle"), "wb") as f:

@@ -12,7 +12,7 @@ from commonroad.scenario.trajectory import State
 from commonroad_rl.gym_commonroad.utils.scenario import make_valid_orientation
 from commonroad.common.solution import VehicleModel, VehicleType
 from commonroad_dc.collision.trajectory_queries import trajectory_queries
-from commonroad_dc.feasibility.vehicle_dynamics import VehicleDynamics, FrictionCircleException
+from commonroad_dc.feasibility.vehicle_dynamics import VehicleDynamics, FrictionCircleException, InputBoundsException
 from vehiclemodels.vehicle_parameters import VehicleParameters
 from vehiclemodels.parameters_vehicle1 import parameters_vehicle1
 from vehiclemodels.parameters_vehicle2 import parameters_vehicle2
@@ -271,7 +271,7 @@ class ContinuousVehicle(Vehicle):
             x_current_old = copy.deepcopy(x_current)
             x_current = self.vehicle_dynamic.forward_simulation(x_current, u_input, self.dt, throw=True)
             self.violate_friction = False
-        except FrictionCircleException:
+        except (FrictionCircleException, InputBoundsException):
             self.violate_friction = True
             for _ in range(N_INTEGRATION_STEPS):
                 # simulate state transition - t parameter is set to vehicle.dt but irrelevant for the current vehicle models

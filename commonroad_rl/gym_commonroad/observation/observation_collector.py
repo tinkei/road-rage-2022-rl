@@ -190,7 +190,9 @@ class ObservationCollector:
                 # TODO: remove if when https://gitlab.lrz.de/cps/commonroad-drivability-checker/-/issues/16 is fixed
                     collision_object, err = trajectory_queries.trajectory_preprocess_obb_sum(collision_object)
                     if err:
-                        raise Exception("<ObservationCollector.create_collision_checker_scenario> Error create convex hull")
+                        print(f'Error creating convex hull! {collision_object} {err} {repr(err)}')
+                        continue
+                        # raise Exception("<ObservationCollector.create_collision_checker_scenario> Error create convex hull")
             elif isinstance(co.obstacle_shape, Circle):
                 collision_object = ObservationCollector.create_convex_hull_collision_circle(co)
             else:
@@ -464,6 +466,8 @@ class ObservationCollector:
 
             route_candidates = route_planner.plan_routes()
             route = route_candidates.retrieve_best_route_by_orientation()
+            if route is None:
+                print(f'Route is NONE!!!!! sc: {str(self._scenario)} pp: {str(self._planning_problem)}')
 
             navigator = Navigator(route)
 

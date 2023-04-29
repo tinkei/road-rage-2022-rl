@@ -17,8 +17,8 @@ import commonroad_dc.pycrccosy as pycrccosy
 from commonroad_dc.geometry.util import resample_polyline, compute_polyline_length
 import commonroad.geometry.shape as cr_shape
 from shapely.geos import LOG
-from shapely.ops import cascaded_union
-from shapely.geometry import Polygon
+from shapely.ops import cascaded_union, unary_union
+from shapely.geometry import Polygon, MultiPolygon
 
 LOGGER = logging.getLogger(__name__)
 
@@ -334,10 +334,18 @@ class Navigator:
         :return: tuples of x,y coordinates of the middle points of each face of the goal region
         """
         # version 2020 # version 06.2021
+        if goal_shape.type == 'MultiPolygon': # isinstance(goal_shape, MultiPolygon):
+            print(f'Goal shape is not supported! It is a {goal_shape.type}!')
+            eps = 0.01
+            goal_shape = unary_union([
+                Polygon(component.exterior).buffer(eps).buffer(-eps) for component in goal_shape
+            ])
+            goal_shape = Polygon(goal_shape.convex_hull)
+            print(f'Goal shape merged to {goal_shape.type}.')
         assert isinstance(goal_shape, Polygon), (
             f"Only single Polygon is supported, but {type(goal_shape)} was given,"
             f" Use a planning problem with contiguous goal region"
-        )
+        ) # Fuck you: https://gis.stackexchange.com/questions/180142/converting-shapely-multipolygon-to-polygon-technique-doesnt-always-work
 
         goal_coords = [np.array(x) for x in zip(*goal_shape.exterior.coords.xy)]
 
@@ -377,7 +385,7 @@ class Navigator:
             return polygon_list
 
         def merge_polygons(polygons_to_merge):
-            return cascaded_union(
+            return unary_union(
                 [
                     geom if geom.is_valid else geom.buffer(0)
                     for geom in polygons_to_merge

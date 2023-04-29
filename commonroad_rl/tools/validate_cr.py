@@ -102,19 +102,23 @@ def check_obstacle_off_road(scenario: Scenario):
     errors = 0
     for o in scenario.obstacles:
         off_road = True
+        obs_type = 'Unknown obstacle'
         if isinstance(o, DynamicObstacle):
+            obs_type = 'Dynamic obstacle'
+        if isinstance(o, DynamicObstacle) and hasattr(o.prediction, 'trajectory'):
             for s in o.prediction.trajectory.state_list:
                 if scenario.lanelet_network.find_lanelet_by_position([s.position]):
                     off_road = False
                     break
         elif isinstance(o, StaticObstacle):
+            obs_type = 'Static obstacle'
             off_road = not scenario.lanelet_network.find_lanelet_by_position(
                 [o.initial_state.position]
             )
         try:
             assert not off_road
         except AssertionError:
-            print(f"Obstacle {o.obstacle_id} is off the road at all times")
+            print(f"{obs_type} {o.obstacle_id} is off the road at all times")
             errors += 1
     return errors
 

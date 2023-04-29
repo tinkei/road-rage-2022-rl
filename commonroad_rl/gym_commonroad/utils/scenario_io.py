@@ -77,10 +77,12 @@ def scenario_id_to_location(benchmark_id: str) -> str:
 
 
 def restore_scenario(meta_scenario: Scenario, obstacle_list: List[DynamicObstacle], scenario_id: ScenarioID):
+    # import copy
     # scenario_new = copy.deepcopy(meta_scenario)
     # scenario_new.add_objects(obstacle_list)
     # return scenario_new
     # TODO: try remove and re-add obstacles ( 2times faster than using deepcopy, 1329ms vs 3514ms)
+    # Nah it DOESN'T FUCKING WORK!
     meta_scenario.scenario_id = scenario_id
     meta_scenario.remove_obstacle(meta_scenario.obstacles)
     meta_scenario.add_objects(obstacle_list)

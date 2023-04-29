@@ -204,6 +204,7 @@ class CommonroadEnv(gym.Env):
 
         :return: observation
         """
+        # print(f'Reset: benchmark_id {benchmark_id} scenario {scenario.scenario_id} pp {planning_problem.planning_problem_id}')
         self._set_scenario_problem(benchmark_id, scenario=scenario, planning_problem=planning_problem)
         self.ego_action.reset(self.planning_problem.initial_state, self.scenario.dt)
         self.observation_collector.reset(self.scenario, self.planning_problem, self.reset_config, self.benchmark_id,
@@ -259,6 +260,7 @@ class CommonroadEnv(gym.Env):
 
         self.v_ego_mean += self.ego_action.vehicle.state.velocity
         self.observation_list.append(self.observation_list)
+        # print(f'Step {self.benchmark_id} {str(self.scenario.scenario_id)}')
         assert str(self.scenario.scenario_id) == self.benchmark_id
         info = {
             "scenario_name": self.benchmark_id,
@@ -405,6 +407,7 @@ class CommonroadEnv(gym.Env):
             self.reset_config = self.meta_scenario_reset_dict[map_id]
             # meta_scenario = self.problem_meta_scenario_dict[self.benchmark_id]
             self.scenario = restore_scenario(self.reset_config["meta_scenario"], problem_dict["obstacle"], scenario_id)
+            # print(f'Random problem: {list(problem_dict["planning_problem_set"].planning_problem_dict.values())}')
             self.planning_problem: PlanningProblem = random.choice(
                 list(problem_dict["planning_problem_set"].planning_problem_dict.values())
             )
