@@ -3,8 +3,8 @@
 env_configs:
   # vehicle model and types
   vehicle_params:
-    vehicle_type: 2  # 1: FORD_ESCORT; 2: BMW_320i; 3: VW_VANAGON
-    vehicle_model: 4  # 0: PM, 1: ST, 2: KS, 3: MB, 4: YawRate
+    vehicle_type: 1  # 1: FORD_ESCORT; 2: BMW_320i; 3: VW_VANAGON
+    vehicle_model: 2  # 0: PM, 1: ST, 2: KS, 3: MB, 4: YawRate
 
   # action configuration
   action_configs:
