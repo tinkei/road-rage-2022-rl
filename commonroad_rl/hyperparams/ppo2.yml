@@ -2,9 +2,17 @@ commonroad-v1:
   normalize: true
   # n_envs: 8
   # n_timesteps: !!float 1e4
-  policy: 'MlpPolicy' # 'MlpPolicy' 'MlpLstmPolicy'
-#  policy_kwargs: "dict(n_lstm=8)"
-  n_steps: 1024 # 2048
+  # policy: 'MlpPolicy' # 'MlpPolicy' 'MlpLstmPolicy' 'MlpLnLstmPolicy'
+  policy: 'MlpPolicy'
+  # policy_kwargs: "dict(n_lstm=8)"
+  # policy_kwargs: # 'MlpLnLstmPolicy'
+  #   net_arch: [256, 128, 'lstm', 64]
+  #   n_lstm: 128
+  policy_kwargs:
+    net_arch: [256, 128, 128, 64]
+  #   optimizer_class: torch.optim.Adadelta
+  # n_steps: 1024 # 2048
+  n_steps: 256
   nminibatches: 1 #32
   lam: 0.95
   gamma: 0.99
